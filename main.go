@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"net"
 	"time"
@@ -18,10 +19,12 @@ func init() {
 }
 
 func main() {
+	fmt.Println(dialCost())
+}
+func dialCost() string {
 
-	nowt := time.Now()
+	startTime := time.Now()
 	timeout := time.NewTicker(time.Second * 5)
-	conn, err := net.DialTCP("tcp", nil, resolveTCPAddr(server))
 	go func() {
 		for {
 			select {
@@ -32,13 +35,14 @@ func main() {
 			}
 		}
 	}()
+	conn, err := net.DialTCP("tcp", nil, resolveTCPAddr(server))
 
 	if err != nil {
 		log.Fatal(err)
 	}
-	conn.Close()
-	log.Printf("cost : %s", time.Since(nowt).String())
-
+	defer conn.Close()
+	cost := time.Since(startTime).String()
+	return cost
 }
 
 func resolveTCPAddr(addr string) *net.TCPAddr {
